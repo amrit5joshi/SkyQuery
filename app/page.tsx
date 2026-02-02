@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Container } from "@/components/ui/Container";
 import { SearchForm } from "@/components/search/SearchForm";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { FlightList } from "@/components/results/FlightList";
 
 export default function Home() {
     return (
@@ -17,8 +18,14 @@ export default function Home() {
                 </div>
 
                 <div className="w-full max-w-4xl">
-                    <Suspense fallback={<div className="h-24 w-full rounded-lg bg-muted animate-pulse" />}>
+                    <Suspense fallback={<Skeleton className="h-24 w-full" />}>
                         <SearchForm />
+                    </Suspense>
+                </div>
+
+                <div className="w-full max_w-4xl pt-8 text-left">
+                    <Suspense fallback={<Skeleton className="h-40 w-full" />}>
+                        <FlightList />
                     </Suspense>
                 </div>
             </div>
