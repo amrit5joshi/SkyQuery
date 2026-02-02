@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Header } from "@/components/layout/Header";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -19,11 +20,14 @@ export default function RootLayout({
         <html lang="en">
             <body
                 className={cn(
-                    "min-h-screen bg-background font-sans antialiased",
+                    "min-h-screen bg-background font-sans antialiased flex flex-col",
                     inter.variable
                 )}
             >
-                {children}
+                <Header />
+                <main className="flex-1">
+                    {children}
+                </main>
             </body>
         </html>
     );
