@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/Button";
 
 interface FlightCardProps {
     offer: FlightOffer;
+    isCheapest?: boolean;
+    isFastest?: boolean;
 }
 
-export function FlightCard({ offer }: FlightCardProps) {
+export function FlightCard({ offer, ...props }: FlightCardProps) {
     return (
         <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
             <div className="flex-1 space-y-4">
@@ -19,6 +21,18 @@ export function FlightCard({ offer }: FlightCardProps) {
             <div className="flex flex-col items-end gap-2 sm:border-l sm:pl-6">
                 <div className="text-2xl font-bold text-primary">
                     {formatCurrency(offer.price.total, offer.price.currency)}
+                </div>
+                <div className="flex gap-2">
+                    {props.isCheapest && (
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            Cheapest
+                        </span>
+                    )}
+                    {props.isFastest && (
+                        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                            Fastest
+                        </span>
+                    )}
                 </div>
                 <Button size="sm">Select</Button>
             </div>

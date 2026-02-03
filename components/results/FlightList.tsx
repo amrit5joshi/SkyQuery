@@ -11,6 +11,8 @@ import { useFilterStore } from "@/store/filterStore";
 import { filterFlights, getMaxPrice, getUniqueAirlines } from "@/lib/filtering";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
 import { PriceGraph } from "@/components/analytics/PriceGraph";
+import { MobileFilterDrawer } from "@/components/filters/MobileFilterDrawer";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function FlightList() {
     const { getSearchParams } = useSearchUrl();
@@ -24,25 +26,49 @@ export function FlightList() {
         filterState.reset();
     }, [searchParams.origin, searchParams.destination, searchParams.departureDate]);
 
-    const { filteredFlights, availableAirlines, maxPrice } = useMemo(() => {
-        if (!flights) return { filteredFlights: [], availableAirlines: [], maxPrice: 1000 };
+    const { filteredFlights, availableAirlines, maxPrice, cheapestId, fastestId } = useMemo(() => {
+        if (!flights) return { filteredFlights: [], availableAirlines: [], maxPrice: 1000, cheapestId: "", fastestId: "" };
 
         const availableAirlines = getUniqueAirlines(flights);
         const maxPrice = getMaxPrice(flights);
 
+        // Apply filters
         const filtered = filterFlights(flights, {
             maxPrice: filterState.maxPrice,
             stops: filterState.stops,
             airlines: filterState.airlines
         });
 
+        // Find badges
+        let cheapestId = "";
+        let fastestId = "";
+        let minPrice = Infinity;
+        let minDurationStr = "";
+
+        // Calculate badges only if we have results
+        if (filtered.length > 0) {
+            filtered.forEach(f => {
+                const price = parseFloat(f.price.total);
+                if (price < minPrice) {
+                    minPrice = price;
+                    cheapestId = f.id;
+                }
+                const duration = f.itineraries[0].duration; // ISO string comparison
+                if (!minDurationStr || duration.localeCompare(minDurationStr) < 0) { // simplified duration check
+                    minDurationStr = duration;
+                    fastestId = f.id;
+                }
+            });
+        }
+
+        // Apply sorting
         if (sortBy === "price") {
             filtered.sort((a, b) => parseFloat(a.price.total) - parseFloat(b.price.total));
         } else if (sortBy === "duration") {
             filtered.sort((a, b) => a.itineraries[0].duration.localeCompare(b.itineraries[0].duration));
         }
 
-        return { filteredFlights: filtered, availableAirlines, maxPrice };
+        return { filteredFlights: filtered, availableAirlines, maxPrice, cheapestId, fastestId };
     }, [flights, filterState.maxPrice, filterState.stops, filterState.airlines, sortBy]);
 
     if (isLoading) {
@@ -79,14 +105,22 @@ export function FlightList() {
 
     return (
         <div className="grid gap-8 lg:grid-cols-4">
+            {/* Sidebar - Hidden on mobile */}
             <aside className="hidden lg:block">
                 <div className="sticky top-24">
                     <FilterSidebar maxPrice={maxPrice} airlines={availableAirlines} />
                 </div>
             </aside>
 
+            {/* Results */}
             <div className="lg:col-span-3 space-y-4">
 
+                {/* Mobile Filters Trigger */}
+                <div className="lg:hidden">
+                    <MobileFilterDrawer maxPrice={maxPrice} airlines={availableAirlines} />
+                </div>
+
+                {/* Price Trend Chart */}
                 {filteredFlights.length > 0 && (
                     <PriceGraph flights={filteredFlights} />
                 )}
@@ -103,9 +137,24 @@ export function FlightList() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {filteredFlights.map((flight) => (
-                            <FlightCard key={flight.id} offer={flight} />
-                        ))}
+                        <AnimatePresence mode="popLayout">
+                            {filteredFlights.map((flight) => (
+                                <motion.div
+                                    key={flight.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <FlightCard
+                                        offer={flight}
+                                        isCheapest={flight.id === cheapestId}
+                                        isFastest={flight.id === fastestId}
+                                    />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     </div>
                 )}
             </div>
