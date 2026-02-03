@@ -10,6 +10,7 @@ import { FlightOffer } from "@/types/flight";
 import { useFilterStore } from "@/store/filterStore";
 import { filterFlights, getMaxPrice, getUniqueAirlines } from "@/lib/filtering";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
+import { PriceGraph } from "@/components/analytics/PriceGraph";
 
 export function FlightList() {
     const { getSearchParams } = useSearchUrl();
@@ -85,6 +86,11 @@ export function FlightList() {
             </aside>
 
             <div className="lg:col-span-3 space-y-4">
+
+                {filteredFlights.length > 0 && (
+                    <PriceGraph flights={filteredFlights} />
+                )}
+
                 <ResultsToolbar
                     totalResults={filteredFlights.length}
                     currentSort={sortBy}
