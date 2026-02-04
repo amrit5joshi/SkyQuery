@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Search, Plane, ChevronDown } from "lucide-react";
@@ -99,7 +100,7 @@ export function SearchForm({ className }: { className?: string }) {
                             <DatePicker
                                 date={field.value ? new Date(field.value) : undefined}
                                 setDate={(date) => {
-                                    const newDep = date ? date.toISOString().split('T')[0] : "";
+                                    const newDep = date ? format(date, "yyyy-MM-dd") : "";
                                     field.onChange(newDep);
 
                                     const ret = watch("returnDate");
@@ -124,7 +125,7 @@ export function SearchForm({ className }: { className?: string }) {
                             return (
                                 <DatePicker
                                     date={field.value ? new Date(field.value) : undefined}
-                                    setDate={(date) => field.onChange(date ? date.toISOString().split('T')[0] : undefined)}
+                                    setDate={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : undefined)}
                                     placeholder="Return"
                                     className={cn(errors.returnDate && "border-destructive")}
                                     minDate={depDate ? new Date(depDate) : new Date()}
@@ -155,7 +156,7 @@ export function SearchForm({ className }: { className?: string }) {
                                             const dep = watch("departureDate");
                                             const date = dep ? new Date(dep) : new Date();
                                             date.setDate(date.getDate() + 7);
-                                            setValue("returnDate", date.toISOString().split('T')[0]);
+                                            setValue("returnDate", format(date, "yyyy-MM-dd"));
                                         }
                                     }}
                                 >
