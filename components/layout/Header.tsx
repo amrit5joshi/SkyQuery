@@ -1,8 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { Plane } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 
 export function Header() {
+    const handleComingSoon = (e: React.MouseEvent) => {
+        e.preventDefault();
+        alert("Feature coming soon!");
+    };
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <Container>
@@ -23,12 +30,14 @@ export function Header() {
                         </Link>
                         <Link
                             href="#"
+                            onClick={handleComingSoon}
                             className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                         >
                             Hotels
                         </Link>
                         <Link
                             href="#"
+                            onClick={handleComingSoon}
                             className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
                         >
                             Explore
