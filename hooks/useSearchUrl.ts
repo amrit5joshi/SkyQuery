@@ -11,8 +11,8 @@ export function useSearchUrl() {
             const newSearchParams = new URLSearchParams(searchParams.toString());
 
             Object.entries(params).forEach(([key, value]) => {
-                if (value) {
-                    newSearchParams.set(key, value);
+                if (value !== undefined && value !== null && value !== "") {
+                    newSearchParams.set(key, String(value));
                 } else {
                     newSearchParams.delete(key);
                 }
@@ -33,6 +33,8 @@ export function useSearchUrl() {
             destination: searchParams.get("destination") || "",
             departureDate: searchParams.get("departureDate") || "",
             returnDate: searchParams.get("returnDate") || undefined,
+            adults: Number(searchParams.get("adults")) || 1,
+            travelClass: (searchParams.get("travelClass") as any) || "ECONOMY",
         };
     };
 

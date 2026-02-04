@@ -23,7 +23,7 @@ export default function Home() {
                     </Suspense>
                 </div>
 
-                <div className="w-full max_w-4xl pt-8 text-left">
+                <div className="w-full max-w-4xl pt-8 text-left">
                     <Suspense fallback={<Skeleton className="h-40 w-full" />}>
                         <FlightList />
                     </Suspense>

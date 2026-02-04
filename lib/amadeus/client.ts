@@ -10,6 +10,7 @@ interface SearchParams {
     departureDate: string;
     returnDate?: string;
     adults: string;
+    travelClass?: string;
     max?: string;
 }
 
@@ -26,6 +27,10 @@ export async function searchFlightOffers(params: SearchParams) {
 
     if (params.returnDate) {
         searchParams.append("returnDate", params.returnDate);
+    }
+
+    if (params.travelClass) {
+        searchParams.append("travelClass", params.travelClass);
     }
 
     const response = await fetch(`${BASE_URL}/shopping/flight-offers?${searchParams}`, {

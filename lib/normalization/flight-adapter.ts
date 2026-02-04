@@ -40,7 +40,7 @@ interface AmadeusOffer {
     travelerPricings: any[];
 }
 
-export function normalizeFlightOffer(rawOffer: AmadeusOffer): FlightOffer {
+export function normalizeFlightOffer(rawOffer: AmadeusOffer, locations?: Record<string, any>): FlightOffer {
     return {
         id: rawOffer.id,
         price: {
@@ -48,28 +48,30 @@ export function normalizeFlightOffer(rawOffer: AmadeusOffer): FlightOffer {
             total: rawOffer.price.grandTotal || rawOffer.price.total,
             base: rawOffer.price.base,
         },
-        itineraries: rawOffer.itineraries.map(normalizeItinerary),
+        itineraries: rawOffer.itineraries.map((it) => normalizeItinerary(it, locations)),
         validatingAirlineCodes: rawOffer.validatingAirlineCodes,
         numberOfBookableSeats: rawOffer.numberOfBookableSeats,
     };
 }
 
-function normalizeItinerary(rawItinerary: AmadeusItinerary): FlightItinerary {
+function normalizeItinerary(rawItinerary: AmadeusItinerary, locations?: Record<string, any>): FlightItinerary {
     return {
-        duration: rawItinerary.duration, // e.g. "PT2H30M"
-        segments: rawItinerary.segments.map(normalizeSegment),
+        duration: rawItinerary.duration,
+        segments: rawItinerary.segments.map((seg) => normalizeSegment(seg, locations)),
     };
 }
 
-function normalizeSegment(rawSegment: AmadeusSegment): FlightSegment {
+function normalizeSegment(rawSegment: AmadeusSegment, locations?: Record<string, any>): FlightSegment {
     return {
         departure: {
             iataCode: rawSegment.departure.iataCode,
             at: rawSegment.departure.at,
+            city: locations?.[rawSegment.departure.iataCode]?.cityCode || locations?.[rawSegment.departure.iataCode]?.cityName,
         },
         arrival: {
             iataCode: rawSegment.arrival.iataCode,
             at: rawSegment.arrival.at,
+            city: locations?.[rawSegment.arrival.iataCode]?.cityCode || locations?.[rawSegment.arrival.iataCode]?.cityName,
         },
         carrierCode: rawSegment.carrierCode,
         number: rawSegment.number,
@@ -77,9 +79,17 @@ function normalizeSegment(rawSegment: AmadeusSegment): FlightSegment {
     };
 }
 
-export function normalizeFlightOffers(rawResponse: { data: AmadeusOffer[] }): FlightOffer[] {
+interface AmadeusResponse {
+    data: AmadeusOffer[];
+    dictionaries?: {
+        locations?: Record<string, any>;
+    };
+}
+
+export function normalizeFlightOffers(rawResponse: AmadeusResponse): FlightOffer[] {
     if (!rawResponse || !Array.isArray(rawResponse.data)) {
         return [];
     }
-    return rawResponse.data.map(normalizeFlightOffer);
+    const locations = rawResponse.dictionaries?.locations;
+    return rawResponse.data.map((offer) => normalizeFlightOffer(offer, locations));
 }

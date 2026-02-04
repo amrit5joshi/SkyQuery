@@ -6,7 +6,6 @@ import { FlightCard } from "./FlightCard";
 import { ResultsToolbar, SortOption } from "./ResultsToolbar";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useState, useMemo, useEffect } from "react";
-import { FlightOffer } from "@/types/flight";
 import { useFilterStore } from "@/store/filterStore";
 import { filterFlights, getMaxPrice, getUniqueAirlines } from "@/lib/filtering";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
@@ -32,20 +31,17 @@ export function FlightList() {
         const availableAirlines = getUniqueAirlines(flights);
         const maxPrice = getMaxPrice(flights);
 
-        // Apply filters
         const filtered = filterFlights(flights, {
             maxPrice: filterState.maxPrice,
             stops: filterState.stops,
             airlines: filterState.airlines
         });
 
-        // Find badges
         let cheapestId = "";
         let fastestId = "";
         let minPrice = Infinity;
         let minDurationStr = "";
 
-        // Calculate badges only if we have results
         if (filtered.length > 0) {
             filtered.forEach(f => {
                 const price = parseFloat(f.price.total);
@@ -53,15 +49,14 @@ export function FlightList() {
                     minPrice = price;
                     cheapestId = f.id;
                 }
-                const duration = f.itineraries[0].duration; // ISO string comparison
-                if (!minDurationStr || duration.localeCompare(minDurationStr) < 0) { // simplified duration check
+                const duration = f.itineraries[0].duration;
+                if (!minDurationStr || duration.localeCompare(minDurationStr) < 0) {
                     minDurationStr = duration;
                     fastestId = f.id;
                 }
             });
         }
 
-        // Apply sorting
         if (sortBy === "price") {
             filtered.sort((a, b) => parseFloat(a.price.total) - parseFloat(b.price.total));
         } else if (sortBy === "duration") {
@@ -105,22 +100,17 @@ export function FlightList() {
 
     return (
         <div className="grid gap-8 lg:grid-cols-4">
-            {/* Sidebar - Hidden on mobile */}
             <aside className="hidden lg:block">
                 <div className="sticky top-24">
                     <FilterSidebar maxPrice={maxPrice} airlines={availableAirlines} />
                 </div>
             </aside>
 
-            {/* Results */}
             <div className="lg:col-span-3 space-y-4">
 
-                {/* Mobile Filters Trigger */}
                 <div className="lg:hidden">
                     <MobileFilterDrawer maxPrice={maxPrice} airlines={availableAirlines} />
                 </div>
-
-                {/* Price Trend Chart */}
                 {filteredFlights.length > 0 && (
                     <PriceGraph flights={filteredFlights} />
                 )}
@@ -129,6 +119,8 @@ export function FlightList() {
                     totalResults={filteredFlights.length}
                     currentSort={sortBy}
                     onSortChange={setSortBy}
+                    travelClass={searchParams.travelClass}
+                    adults={searchParams.adults}
                 />
 
                 {filteredFlights.length === 0 ? (

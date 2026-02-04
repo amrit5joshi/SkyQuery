@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/Button";
-import { ArrowUpDown } from "lucide-react";
 
 export type SortOption = "price" | "duration" | "cheapest";
 
@@ -7,13 +6,22 @@ interface ResultsToolbarProps {
     totalResults: number;
     currentSort: SortOption;
     onSortChange: (sort: SortOption) => void;
+    travelClass?: string;
+    adults?: number;
 }
 
-export function ResultsToolbar({ totalResults, currentSort, onSortChange }: ResultsToolbarProps) {
+export function ResultsToolbar({ totalResults, currentSort, onSortChange, travelClass, adults }: ResultsToolbarProps) {
+    const classLabel = travelClass?.toLowerCase().replace("_", " ") || "economy";
+
     return (
-        <div className="flex items-center justify-between py-4">
-            <div className="text-sm text-muted-foreground">
-                Found <span className="font-medium text-foreground">{totalResults}</span> results
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
+            <div className="flex flex-col gap-1">
+                <div className="text-sm text-muted-foreground uppercase tracking-wider text-[10px] font-bold">
+                    {classLabel} • {adults || 1} {(adults || 1) > 1 ? "Travelers" : "Traveler"}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                    Found <span className="font-medium text-foreground">{totalResults}</span> results
+                </div>
             </div>
 
             <div className="flex items-center gap-2">
@@ -23,7 +31,6 @@ export function ResultsToolbar({ totalResults, currentSort, onSortChange }: Resu
                     className="h-8 gap-2 text-muted-foreground hover:text-primary"
                     onClick={() => {
                         navigator.clipboard.writeText(window.location.href);
-                        // Optional: Could add toast here, but for MVP simple feedback is fine
                         const btn = document.getElementById("share-btn-text");
                         if (btn) {
                             btn.innerText = "Copied!";

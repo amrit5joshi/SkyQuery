@@ -5,7 +5,6 @@ import {
     BarChart,
     Bar,
     XAxis,
-    YAxis,
     Tooltip,
     ResponsiveContainer,
     Cell,
@@ -44,7 +43,7 @@ export function PriceGraph({ flights }: PriceGraphProps) {
                         }}
                     />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        {data.map((entry, index) => (
+                        {data.map((_, index) => (
                             <Cell key={`cell-${index}`} fill="hsl(var(--primary))" />
                         ))}
                     </Bar>

@@ -15,6 +15,8 @@ export const searchSchema = z.object({
         message: "Departure date must be in the future",
     }),
     returnDate: z.string().optional(),
+    adults: z.number().min(1).max(9).default(1),
+    travelClass: z.enum(["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"]).default("ECONOMY"),
 });
 
 export type SearchParams = z.infer<typeof searchSchema>;

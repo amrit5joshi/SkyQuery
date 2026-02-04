@@ -9,6 +9,8 @@ async function fetchFlights(params: Partial<SearchParams>): Promise<FlightOffer[
     if (params.destination) searchParams.set("destination", params.destination);
     if (params.departureDate) searchParams.set("departureDate", params.departureDate);
     if (params.returnDate) searchParams.set("returnDate", params.returnDate);
+    if (params.adults) searchParams.set("adults", params.adults.toString());
+    if (params.travelClass) searchParams.set("travelClass", params.travelClass);
 
     const response = await fetch(`/api/amadeus/flight-offers?${searchParams.toString()}`);
 
@@ -30,6 +32,6 @@ export function useFlightSearch(searchParams: Partial<SearchParams>) {
         queryKey: ["flights", searchParams],
         queryFn: () => fetchFlights(searchParams),
         enabled: isEnabled,
-        staleTime: 1000 * 60 * 5, // 5 minutes
+        staleTime: 1000 * 60 * 5,
     });
 }

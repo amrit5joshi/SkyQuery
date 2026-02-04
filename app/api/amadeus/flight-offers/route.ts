@@ -8,6 +8,8 @@ const querySchema = z.object({
     destination: z.string().length(3),
     departureDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     returnDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    adults: z.string().regex(/^\d+$/).default("1"),
+    travelClass: z.enum(["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"]).optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -18,6 +20,8 @@ export async function GET(request: NextRequest) {
         destination: searchParams.get("destination") || "",
         departureDate: searchParams.get("departureDate") || "",
         returnDate: searchParams.get("returnDate") || undefined,
+        adults: searchParams.get("adults") || "1",
+        travelClass: searchParams.get("travelClass") || undefined,
     };
 
     try {
@@ -28,7 +32,8 @@ export async function GET(request: NextRequest) {
             destinationLocationCode: validParams.destination,
             departureDate: validParams.departureDate,
             returnDate: validParams.returnDate,
-            adults: "1", // Hardcoded to 1 adult for this demo
+            adults: validParams.adults,
+            travelClass: validParams.travelClass,
             max: "20",
         });
 

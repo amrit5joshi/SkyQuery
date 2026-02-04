@@ -2,10 +2,12 @@ export interface FlightSegment {
     departure: {
         iataCode: string;
         at: string; // ISO DateTime
+        city?: string;
     };
     arrival: {
         iataCode: string;
         at: string; // ISO DateTime
+        city?: string;
     };
     carrierCode: string;
     number: string;
